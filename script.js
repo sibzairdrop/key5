@@ -39,100 +39,69 @@ document.addEventListener('DOMContentLoaded', () => {
     const keyContainer = document.getElementById('keyContainer');
     const keysList = document.getElementById('keysList');
     const copyAllBtn = document.getElementById('copyAllBtn');
-    const generateMoreBtn = document.getElementById('generateMoreBtn');
-    const copyStatus = document.getElementById('copyStatus');
-    const sourceCodeBtn = document.getElementById('sourceCode');
+    const generatedKeysTitle = document.getElementById('generatedKeysTitle');
     const gameSelect = document.getElementById('gameSelect');
-    
-    startBtn.addEventListener('click', () => {
-        const gameId = gameSelect.value;
+    const copyStatus = document.getElementById('copyStatus');
+    const gameSelectGroup = document.getElementById('gameSelectGroup');
+    const keyCountGroup = document.getElementById('keyCountGroup');
+
+    startBtn.addEventListener('click', async () => {
+        const gameChoice = parseInt(gameSelect.value);
         const keyCount = parseInt(keyCountSelect.value);
+        const game = games[gameChoice];
 
-        if (!gameId || !keyCount) {
-            alert('Please select both game and number of keys.');
-            return;
-        }
-
-        const { appToken, promoId } = games[gameId];
-        startGeneration(appToken, promoId, keyCount);
-    });
-
-    function startGeneration(appToken, promoId, keyCount) {
+        // Hide the form sections and show progress
+        gameSelectGroup.classList.add('hidden');
+        keyCountGroup.classList.add('hidden');
+        startBtn.classList.add('hidden');
         progressContainer.classList.remove('hidden');
-        keyContainer.classList.add('hidden');
-        generateMoreBtn.classList.add('hidden');
-        copyStatus.classList.add('hidden');
 
-        let progress = 0;
-        progressText.textContent = `0%`;
         progressBar.style.width = '0%';
+        progressText.textContent = '0%';
         progressLog.textContent = 'Generating keys...';
 
-        const intervalId = setInterval(() => {
-            progress += 10;
-            if (progress > 100) {
-                progress = 100;
-                clearInterval(intervalId);
-                progressLog.textContent = 'Generation complete!';
-                displayKeys(keyCount);
-            }
-
+        const keys = [];
+        for (let i = 0; i < keyCount; i++) {
+            // Simulate key generation
+            await new Promise(resolve => setTimeout(resolve, EVENTS_DELAY / keyCount));
+            keys.push(`KEY-${Math.random().toString(36).substr(2, 10).toUpperCase()}`);
+            const progress = ((i + 1) / keyCount) * 100;
             progressBar.style.width = `${progress}%`;
-            progressText.textContent = `${progress}%`;
-        }, EVENTS_DELAY / 10);
-    }
-
-    function displayKeys(count) {
-        keysList.innerHTML = '';
-        for (let i = 0; i < count; i++) {
-            const key = `KEY-${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
-            const keyItem = document.createElement('div');
-            keyItem.className = 'key-item';
-            keyItem.innerHTML = `
-                <input type="text" value="${key}" readonly />
-                <button class="copyKeyBtn" data-key="${key}">Copy</button>
-            `;
-            keysList.appendChild(keyItem);
+            progressText.textContent = `${Math.round(progress)}%`;
         }
 
-        keyContainer.classList.remove('hidden');
-        generateMoreBtn.classList.remove('hidden');
-        copyAllBtn.classList.remove('hidden');
-    }
-
-    keysList.addEventListener('click', (e) => {
-        if (e.target.classList.contains('copyKeyBtn')) {
-            const key = e.target.dataset.key;
-            copyToClipboard(key);
-            copyStatus.classList.remove('hidden');
-            copyStatus.textContent = 'Key copied to clipboard!';
-            setTimeout(() => copyStatus.classList.add('hidden'), 2000);
-        }
+        progressLog.textContent = 'Keys generated!';
+        setTimeout(() => {
+            progressContainer.classList.add('hidden');
+            keyContainer.classList.remove('hidden');
+            generatedKeysTitle.classList.remove('hidden');
+            keysList.innerHTML = keys.map(key => `<div class="key-item"><input type="text" value="${key}" readonly><button class="copyKeyBtn" data-key="${key}">Copy</button></div>`).join('');
+            copyAllBtn.classList.remove('hidden');
+        }, 1000);
     });
 
     copyAllBtn.addEventListener('click', () => {
-        const keys = Array.from(keysList.querySelectorAll('input')).map(input => input.value);
-        keys.forEach(key => copyToClipboard(key));
-        copyStatus.classList.remove('hidden');
-        copyStatus.textContent = 'All keys copied to clipboard!';
-        setTimeout(() => copyStatus.classList.add('hidden'), 2000);
+        const inputs = keysList.querySelectorAll('input');
+        const textToCopy = Array.from(inputs).map(input => input.value).join('\n');
+        navigator.clipboard.writeText(textToCopy)
+            .then(() => {
+                copyStatus.textContent = 'All keys copied to clipboard!';
+                copyStatus.classList.remove('hidden');
+                setTimeout(() => copyStatus.classList.add('hidden'), 2000);
+            })
+            .catch(err => console.error('Failed to copy keys: ', err));
     });
 
-    generateMoreBtn.addEventListener('click', () => {
-        keyContainer.classList.add('hidden');
-        progressContainer.classList.add('hidden');
-    });
-
-    function copyToClipboard(text) {
-        const tempInput = document.createElement('input');
-        tempInput.value = text;
-        document.body.appendChild(tempInput);
-        tempInput.select();
-        document.execCommand('copy');
-        document.body.removeChild(tempInput);
-    }
-
-    sourceCodeBtn.addEventListener('click', () => {
-        window.open('https://github.com/your-repo-url', '_blank');
+    document.addEventListener('click', (event) => {
+        if (event.target.classList.contains('copyKeyBtn')) {
+            const key = event.target.dataset.key;
+            navigator.clipboard.writeText(key)
+                .then(() => {
+                    copyStatus.textContent = `Key "${key}" copied to clipboard!`;
+                    copyStatus.classList.remove('hidden');
+                    setTimeout(() => copyStatus.classList.add('hidden'), 2000);
+                })
+                .catch(err => console.error('Failed to copy key: ', err));
+        }
     });
 });
