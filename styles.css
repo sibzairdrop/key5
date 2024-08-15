@@ -1,6 +1,8 @@
+/* تم دارک برای صفحه */
+
 body {
     font-family: 'Roboto', sans-serif;
-    background-color: #1e1e1e; /* رنگ پس‌زمینه تیره */
+    background-color: #121212; /* رنگ پس‌زمینه تاریک */
     color: #e0e0e0; /* رنگ متن روشن */
     display: flex;
     justify-content: center;
@@ -10,9 +12,9 @@ body {
 }
 
 .container {
-    background: #2c2c2c; /* رنگ پس‌زمینه تیره‌تر */
+    background: #1e1e1e; /* رنگ پس‌زمینه کانتینر تاریک‌تر */
     border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* سایه تیره‌تر */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); /* سایه تاریک‌تر */
     padding: 30px;
     max-width: 400px;
     width: 100%;
@@ -22,7 +24,7 @@ body {
 h1 {
     margin-bottom: 25px;
     font-size: 24px;
-    color: #ff9800; /* رنگ نارنجی برای عنوان */
+    color: #ff9800; /* رنگ عنوان نارنجی */
 }
 
 .form-group {
@@ -34,7 +36,7 @@ label {
     display: block;
     margin-bottom: 8px;
     font-weight: 500;
-    color: #b0b0b0; /* رنگ متن روشن‌تر */
+    color: #e0e0e0; /* رنگ برچسب روشن‌تر */
 }
 
 select {
@@ -42,15 +44,15 @@ select {
     padding: 12px;
     font-size: 16px;
     margin-bottom: 20px;
-    border: 1px solid #444; /* رنگ مرز تیره‌تر */
+    border: 1px solid #333; /* رنگ حاشیه تیره‌تر */
     border-radius: 8px;
-    background: #333; /* رنگ پس‌زمینه تیره‌تر */
-    color: #e0e0e0; /* رنگ متن روشن */
+    background: #222; /* رنگ پس‌زمینه انتخاب‌گر تیره‌تر */
+    color: #e0e0e0; /* رنگ متن انتخاب‌گر روشن‌تر */
     transition: border-color 0.3s;
 }
 
 select:focus {
-    border-color: #ff9800; /* رنگ مرز نارنجی هنگام فوکوس */
+    border-color: #ff9800; /* رنگ حاشیه هنگام فوکوس نارنجی */
 }
 
 button {
@@ -74,7 +76,7 @@ button:hover {
 }
 
 .progress-bar {
-    background-color: #333; /* رنگ پس‌زمینه نوار پیشرفت */
+    background-color: #333; /* رنگ پس‌زمینه نوار پیشرفت تاریک‌تر */
     border-radius: 8px;
     overflow: hidden;
     margin-top: 25px;
@@ -84,7 +86,7 @@ button:hover {
 
 .progress-bar div {
     height: 100%;
-    background-color: #ff9800; /* رنگ پیشرفت نارنجی */
+    background-color: #ff9800; /* رنگ نوار پیشرفت نارنجی */
     width: 0;
     transition: width 0.5s;
 }
@@ -104,18 +106,18 @@ button:hover {
     flex: 1;
     padding: 12px;
     font-size: 16px;
-    border: 1px solid #444; /* رنگ مرز تیره‌تر */
+    border: 1px solid #555; /* رنگ حاشیه ورودی تیره‌تر */
     border-radius: 8px;
     margin-right: 12px;
-    background: #333; /* رنگ پس‌زمینه تیره‌تر */
-    color: #e0e0e0; /* رنگ متن روشن */
+    background: #222; /* رنگ پس‌زمینه ورودی تیره‌تر */
+    color: #e0e0e0; /* رنگ متن ورودی روشن‌تر */
 }
 
 .copyKeyBtn {
     background-color: #ff9800; /* رنگ دکمه کپی نارنجی */
     border: none;
     padding: 12px 20px;
-    color: #1e1e1e; /* رنگ متن دکمه تیره‌تر */
+    color: #1e1e1e; /* رنگ متن دکمه کپی تیره‌تر */
     font-size: 16px;
     border-radius: 8px;
     cursor: pointer;
@@ -126,27 +128,48 @@ button:hover {
     background-color: #e68900; /* رنگ روشن‌تر هنگام هاور */
 }
 
-.social-buttons {
+.footer {
     margin-top: 25px;
+    font-size: 14px;
+    color: #777; /* رنگ متن فوتر روشن‌تر */
 }
+
+#copyStatus {
+    margin-top: 15px;
+    color: #ff9800; /* رنگ وضعیت کپی نارنجی */
+}
+
+/* استایل‌های جدید برای دکمه‌های اجتماعی */
 
 .social-btn {
     display: inline-block;
     background-color: #ff9800; /* رنگ دکمه‌های اجتماعی نارنجی */
-    color: #fff;
-    padding: 12px 20px;
-    font-size: 16px;
+    color: #1e1e1e; /* رنگ متن دکمه‌های اجتماعی تیره‌تر */
+    padding: 10px 15px;
+    margin: 5px;
     border-radius: 8px;
     text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
     transition: background-color 0.3s;
-    margin: 5px;
 }
 
 .social-btn:hover {
     background-color: #e68900; /* رنگ روشن‌تر هنگام هاور */
 }
 
-#copyStatus {
-    margin-top: 15px;
-    color: #ff9800; /* رنگ پیام کپی موفقیت‌آمیز */
+#generateMoreBtn {
+    background-color: #ff9800; /* رنگ دکمه Generate More نارنجی */
+    color: #1e1e1e; /* رنگ متن دکمه Generate More تیره‌تر */
+    border: none;
+    padding: 12px 20px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 20px;
+}
+
+#generateMoreBtn:hover {
+    background-color: #e68900; /* رنگ روشن‌تر هنگام هاور */
 }
