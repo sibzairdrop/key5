@@ -1,33 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const EVENTS_DELAY = 20000;
+    const EVENTS_DELAY = 2000; // Adjusted for testing
 
     const games = {
-        1: {
-            name: 'Riding Extreme 3D',
-            appToken: 'd28721be-fd2d-4b45-869e-9f253b554e50',
-            promoId: '43e35910-c168-4634-ad4f-52fd764a843f',
-        },
-        2: {
-            name: 'Chain Cube 2048',
-            appToken: 'd1690a07-3780-4068-810f-9b5bbf2931b2',
-            promoId: 'b4170868-cef0-424f-8eb9-be0622e8e8e3',
-        },
-        3: {
-            name: 'My Clone Army',
-            appToken: '74ee0b5b-775e-4bee-974f-63e7f4d5bacb',
-            promoId: 'fe693b26-b342-4159-8808-15e3ff7f8767',
-        },
-        4: {
-            name: 'Train Miner',
-            appToken: '82647f43-3f87-402d-88dd-09a90025313f',
-            promoId: 'c4480ac7-e178-4973-8061-9ed5b2e17954',
-        },
-        5: {
-            name: 'Merge Away',
-            appToken: '8d1cc2ad-e097-4b86-90ef-7a27e19fb833',
-            promoId: 'dc128d28-c45b-411c-98ff-ac7726fbaea4'
-        }
-        
+        1: { name: 'Riding Extreme 3D', appToken: 'd28721be-fd2d-4b45-869e-9f253b554e50', promoId: '43e35910-c168-4634-ad4f-52fd764a843f' },
+        2: { name: 'Chain Cube 2048', appToken: 'd1690a07-3780-4068-810f-9b5bbf2931b2', promoId: 'b4170868-cef0-424f-8eb9-be0622e8e8e3' },
+        3: { name: 'My Clone Army', appToken: '74ee0b5b-775e-4bee-974f-63e7f4d5bacb', promoId: 'fe693b26-b342-4159-8808-15e3ff7f8767' },
+        4: { name: 'Train Miner', appToken: '82647f43-3f87-402d-88dd-09a90025313f', promoId: 'c4480ac7-e178-4973-8061-9ed5b2e17954' },
+        5: { name: 'Merge Away', appToken: '8d1cc2ad-e097-4b86-90ef-7a27e19fb833', promoId: 'dc128d28-c45b-411c-98ff-ac7726fbaea4' }
     };
 
     const startBtn = document.getElementById('startBtn');
@@ -58,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             const textArea = document.createElement('textarea');
             textArea.value = text;
-            textArea.style.position = 'fixed';  // Avoid scrolling to bottom of page
+            textArea.style.position = 'fixed';
             textArea.style.top = '0';
             textArea.style.left = '0';
             document.body.appendChild(textArea);
@@ -100,6 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
         copyAllBtn.classList.add('hidden');
 
         let keys = [];
+        let progress = 0;
 
         for (let i = 0; i < keyCount; i++) {
             let hasCode = false;
@@ -109,6 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             const key = await generateKey(clientToken, promoId);
             keys.push(key);
+
             const keyItem = document.createElement('div');
             keyItem.className = 'key-item';
             keyItem.innerHTML = `
@@ -133,9 +114,17 @@ document.addEventListener('DOMContentLoaded', () => {
             copyToClipboard(keys.join('\n'));
         });
 
-        progressBar.style.width = '100%';
-        progressText.innerText = '100%';
-        progressLog.innerText = 'Complete';
+        let interval = setInterval(() => {
+            if (progress >= 100) {
+                clearInterval(interval);
+                progressText.innerText = '100%';
+                progressLog.innerText = 'Complete';
+            } else {
+                progress += 10; // Increment by 10%
+                progressBar.style.width = progress + '%';
+                progressText.innerText = progress + '%';
+            }
+        }, 500); // Update progress every 500ms
 
         startBtn.classList.remove('hidden');
         keyCountSelect.classList.remove('hidden');
@@ -154,7 +143,6 @@ document.addEventListener('DOMContentLoaded', () => {
         keysList.innerHTML = '';
         keyCountLabel.innerText = 'Number of keys:';
         
-        // Show the form sections again
         gameSelectGroup.style.display = 'block';
         keyCountGroup.style.display = 'block';
     });
@@ -168,19 +156,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const login = async (clientId, appToken) => {
         const response = await fetch('https://api.gamepromo.io/promo/login-client', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                appToken,
-                clientId,
-                clientOrigin: 'deviceid'
-            })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ appToken, clientId, clientOrigin: 'deviceid' })
         });
 
-        if (!response.ok) {
-            throw new Error('Failed to login');
-        }
+        if (!response.ok) throw new Error('Failed to login');
 
         const data = await response.json();
         return data.clientToken;
@@ -189,20 +169,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const emulateProgress = async (clientToken, promoId) => {
         const response = await fetch('https://api.gamepromo.io/promo/register-event', {
             method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${clientToken}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                promoId,
-                eventId: generateUUID(),
-                eventOrigin: 'undefined'
-            })
+            headers: { 'Authorization': `Bearer ${clientToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ promoId, eventId: generateUUID(), eventOrigin: 'undefined' })
         });
 
-        if (!response.ok) {
-            return false;
-        }
+        if (!response.ok) return false;
 
         const data = await response.json();
         return data.hasCode;
@@ -211,18 +182,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const generateKey = async (clientToken, promoId) => {
         const response = await fetch('https://api.gamepromo.io/promo/create-code', {
             method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${clientToken}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                promoId
-            })
+            headers: { 'Authorization': `Bearer ${clientToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ promoId })
         });
 
-        if (!response.ok) {
-            throw new Error('Failed to generate key');
-        }
+        if (!response.ok) throw new Error('Failed to generate key');
 
         const data = await response.json();
         return data.promoCode;
