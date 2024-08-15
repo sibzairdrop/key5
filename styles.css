@@ -1,7 +1,7 @@
 body {
     font-family: 'Roboto', sans-serif;
-    background-color: #f5f7fa;
-    color: #333;
+    background-color: #1e1e1e; /* تغییر به رنگ تیره */
+    color: #e0e0e0; /* رنگ متن روشن */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -10,9 +10,9 @@ body {
 }
 
 .container {
-    background: #ffffff;
+    background: #2c2c2c; /* تغییر به رنگ تیره‌تر */
     border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* تغییر شدت سایه */
     padding: 30px;
     max-width: 400px;
     width: 100%;
@@ -22,7 +22,7 @@ body {
 h1 {
     margin-bottom: 25px;
     font-size: 24px;
-    color: #007bff;
+    color: #66bb6a; /* رنگ روشن‌تر برای عنوان */
 }
 
 .form-group {
@@ -34,7 +34,7 @@ label {
     display: block;
     margin-bottom: 8px;
     font-weight: 500;
-    color: #555;
+    color: #b0b0b0; /* رنگ متن روشن‌تر */
 }
 
 select {
@@ -42,19 +42,20 @@ select {
     padding: 12px;
     font-size: 16px;
     margin-bottom: 20px;
-    border: 1px solid #ddd;
+    border: 1px solid #444; /* رنگ مرز تیره‌تر */
     border-radius: 8px;
-    background: #fff;
+    background: #333; /* تغییر به رنگ تیره‌تر */
+    color: #e0e0e0; /* رنگ متن روشن */
     transition: border-color 0.3s;
 }
 
 select:focus {
-    border-color: #007bff;
+    border-color: #66bb6a; /* رنگ مرز روشن‌تر هنگام فوکوس */
 }
 
 button {
-    background-color: #007bff;
-    color: white;
+    background-color: #66bb6a; /* رنگ دکمه روشن‌تر */
+    color: #1e1e1e; /* رنگ متن دکمه تیره‌تر */
     border: none;
     padding: 12px 20px;
     font-size: 16px;
@@ -65,7 +66,7 @@ button {
 }
 
 button:hover {
-    background-color: #0056b3;
+    background-color: #4caf50; /* رنگ روشن‌تر هنگام هاور */
 }
 
 .hidden {
@@ -73,7 +74,7 @@ button:hover {
 }
 
 .progress-bar {
-    background-color: #f5f7fa;
+    background-color: #333; /* تغییر به رنگ تیره‌تر */
     border-radius: 8px;
     overflow: hidden;
     margin-top: 25px;
@@ -83,9 +84,9 @@ button:hover {
 
 .progress-bar div {
     height: 100%;
-    background-color: #007bff;
+    background-color: #66bb6a; /* رنگ پیشرفت روشن‌تر */
     width: 0;
-    transition: width 0.5s ease-in-out;
+    transition: width 0.5s;
 }
 
 #progressText {
@@ -103,17 +104,18 @@ button:hover {
     flex: 1;
     padding: 12px;
     font-size: 16px;
-    border: 1px solid #ccc;
+    border: 1px solid #444; /* رنگ مرز تیره‌تر */
     border-radius: 8px;
     margin-right: 12px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background: #333; /* تغییر به رنگ تیره‌تر */
+    color: #e0e0e0; /* رنگ متن روشن */
 }
 
 .copyKeyBtn {
-    background-color: #28a745;
+    background-color: #28a745; /* رنگ دکمه کپی روشن‌تر */
     border: none;
     padding: 12px 20px;
-    color: white;
+    color: #1e1e1e; /* رنگ متن دکمه تیره‌تر */
     font-size: 16px;
     border-radius: 8px;
     cursor: pointer;
@@ -121,51 +123,30 @@ button:hover {
 }
 
 .copyKeyBtn:hover {
-    background-color: #218838;
-}
-
-.footer {
-    margin-top: 25px;
-    font-size: 14px;
-    color: #777;
-}
-
-#copyStatus {
-    margin-top: 15px;
-    color: green;
+    background-color: #218838; /* رنگ روشن‌تر هنگام هاور */
 }
 
 .social-buttons {
-    margin-top: 20px;
+    margin-top: 25px;
 }
 
 .social-btn {
     display: inline-block;
+    background-color: #007bff; /* رنگ دکمه‌های اجتماعی روشن‌تر */
+    color: #fff;
     padding: 12px 20px;
-    margin: 5px;
+    font-size: 16px;
     border-radius: 8px;
     text-decoration: none;
-    color: white;
-    font-size: 16px;
-    font-family: 'Roboto', sans-serif;
-    text-align: center;
-    transition: background-color 0.3s, transform 0.3s;
+    transition: background-color 0.3s;
+    margin: 5px;
 }
 
-.join-keyhamster {
-    background-color: #1e90ff; /* رنگ دلخواه */
+.social-btn:hover {
+    background-color: #0056b3; /* رنگ روشن‌تر هنگام هاور */
 }
 
-.join-keyhamster:hover {
-    background-color: #187bcd; /* رنگ دلخواه برای حالت hover */
-    transform: scale(1.05);
-}
-
-.join-sibz {
-    background-color: #28a745; /* رنگ دلخواه */
-}
-
-.join-sibz:hover {
-    background-color: #218838; /* رنگ دلخواه برای حالت hover */
-    transform: scale(1.05);
+#copyStatus {
+    margin-top: 15px;
+    color: #66bb6a; /* رنگ پیام کپی موفقیت‌آمیز */
 }
