@@ -133,18 +133,3 @@ button:hover {
     margin-top: 15px;
     color: green;
 }
-
-#telegramChannelBtn, #telegramChannelBtn2 {
-    background-color: #0088cc;
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    margin: 5px;
-    cursor: pointer;
-    border-radius: 8px;
-    transition: background-color 0.3s;
-}
-
-#telegramChannelBtn:hover, #telegramChannelBtn2:hover {
-    background-color: #005f8c;
-}
