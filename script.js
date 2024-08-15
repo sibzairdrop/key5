@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
             appToken: '8d1cc2ad-e097-4b86-90ef-7a27e19fb833',
             promoId: 'dc128d28-c45b-411c-98ff-ac7726fbaea4'
         }
+        
     };
 
     const startBtn = document.getElementById('startBtn');
@@ -50,58 +51,260 @@ document.addEventListener('DOMContentLoaded', () => {
         const keyCount = parseInt(keyCountSelect.value);
         const game = games[gameChoice];
 
-        // Hide the form sections and show progress
-        gameSelectGroup.classList.add('hidden');
-        keyCountGroup.classList.add('hidden');
-        startBtn.classList.add('hidden');
-        progressContainer.classList.remove('hidden');
+        // Hide the form sections
+        gameSelectGroup.style.display = 'none';
+        keyCountGroup.style.display = 'none';
+
+        keyCountLabel.innerText = `Number of keys: ${keyCount}`;
 
         progressBar.style.width = '0%';
-        progressText.textContent = '0%';
-        progressLog.textContent = 'Generating keys...';
+        progressText.innerText = '0%';
+        progressLog.innerText = 'Starting...';
+        progressContainer.classList.remove('hidden');
+        keyContainer.classList.add('hidden');
+        generatedKeysTitle.classList.add('hidden');
+        keysList.innerHTML = '';
+        keyCountSelect.classList.add('hidden');
+        gameSelect.classList.add('hidden');
+        startBtn.classList.add('hidden');
+        copyAllBtn.classList.add('hidden');
+        startBtn.disabled = true;
 
-        const keys = [];
-        for (let i = 0; i < keyCount; i++) {
-            // Simulate key generation
-            await new Promise(resolve => setTimeout(resolve, EVENTS_DELAY / keyCount));
-            keys.push(`KEY-${Math.random().toString(36).substr(2, 10).toUpperCase()}`);
-            const progress = ((i + 1) / keyCount) * 100;
+        let progress = 0;
+        const updateProgress = (increment, message) => {
+            progress += increment;
             progressBar.style.width = `${progress}%`;
-            progressText.textContent = `${Math.round(progress)}%`;
+            progressText.innerText = `${progress}%`;
+            progressLog.innerText = message;
+        };
+
+        const generateKeyProcess = async () => {
+            const clientId = generateClientId();
+            let clientToken;
+            try {
+                clientToken = await login(clientId, game.appToken);
+            } catch (error) {
+                alert(`Failed to login: ${error.message}`);
+                startBtn.disabled = false;
+                return null;
+            }
+
+            for (let i = 0; i < 11; i++) {
+                await sleep(EVENTS_DELAY * delayRandom());
+                const hasCode = await emulateProgress(clientToken, game.promoId);
+                updateProgress(7 / keyCount, 'Emulating progress...');
+                if (hasCode) {
+                    break;
+                }
+            }
+
+            try {
+                const key = await generateKey(clientToken, game.promoId);
+                updateProgress(30 / keyCount, 'Generating key...');
+                return key;
+            } catch (error) {
+                alert(`Failed to generate key: ${error.message}`);
+                return null;
+            }
+        };
+
+        const keys = await Promise.all(Array.from({ length: keyCount }, generateKeyProcess));
+
+        if (keys.length > 1) {
+            keysList.innerHTML = keys.filter(key => key).map(key =>
+                `<div class="key-item">
+                    <input type="text" value="${key}" readonly>
+                    <button class="copyKeyBtn" data-key="${key}">Copy Key</button>
+                </div>`
+            ).join('');
+            copyAllBtn.classList.remove('hidden');
+        } else if (keys.length === 1) {
+            keysList.innerHTML =
+                `<div class="key-item">
+                    <input type="text" value="${keys[0]}" readonly>
+                    <button class="copyKeyBtn" data-key="${keys[0]}">Copy Key</button>
+                </div>`;
         }
 
-        progressLog.textContent = 'Keys generated!';
-        setTimeout(() => {
-            progressContainer.classList.add('hidden');
-            keyContainer.classList.remove('hidden');
-            generatedKeysTitle.classList.remove('hidden');
-            keysList.innerHTML = keys.map(key => `<div class="key-item"><input type="text" value="${key}" readonly><button class="copyKeyBtn" data-key="${key}">Copy</button></div>`).join('');
-            copyAllBtn.classList.remove('hidden');
-        }, 1000);
-    });
+        keyContainer.classList.remove('hidden');
+        generatedKeysTitle.classList.remove('hidden');
+        document.querySelectorAll('.copyKeyBtn').forEach(button => {
+            button.addEventListener('click', (event) => {
+                const key = event.target.getAttribute('data-key');
+                
+                // Check if navigator.clipboard is available
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(key).then(() => {
+                        copyStatus.classList.remove('hidden');
+                        setTimeout(() => copyStatus.classList.add('hidden'), 2000);
+                    }).catch(err => {
+                        console.error('Failed to copy text: ', err);
+                    });
+                } else {
+                    // Fallback method for non-HTTPS environments
+                    const textArea = document.createElement('textarea');
+                    textArea.value = key;
+                    textArea.style.position = 'fixed';  // Avoid scrolling to bottom of page
+                    textArea.style.top = '0';
+                    textArea.style.left = '0';
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
 
-    copyAllBtn.addEventListener('click', () => {
-        const inputs = keysList.querySelectorAll('input');
-        const textToCopy = Array.from(inputs).map(input => input.value).join('\n');
-        navigator.clipboard.writeText(textToCopy)
-            .then(() => {
-                copyStatus.textContent = 'All keys copied to clipboard!';
-                copyStatus.classList.remove('hidden');
-                setTimeout(() => copyStatus.classList.add('hidden'), 2000);
-            })
-            .catch(err => console.error('Failed to copy keys: ', err));
-    });
+                    try {
+                        const successful = document.execCommand('copy');
+                        const msg = successful ? 'successful' : 'unsuccessful';
+                        console.log('Fallback: Copying text command was ' + msg);
+                        if (successful) {
+                            copyStatus.classList.remove('hidden');
+                            setTimeout(() => copyStatus.classList.add('hidden'), 2000);
+                        }
+                    } catch (err) {
+                        console.error('Fallback: Oops, unable to copy', err);
+                    }
 
-    document.addEventListener('click', (event) => {
-        if (event.target.classList.contains('copyKeyBtn')) {
-            const key = event.target.dataset.key;
-            navigator.clipboard.writeText(key)
-                .then(() => {
-                    copyStatus.textContent = `Key "${key}" copied to clipboard!`;
+                    document.body.removeChild(textArea);
+                }
+            });
+        });
+        copyAllBtn.addEventListener('click', () => {
+            const keysText = keys.filter(key => key).join('\n');
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(keysText).then(() => {
                     copyStatus.classList.remove('hidden');
                     setTimeout(() => copyStatus.classList.add('hidden'), 2000);
-                })
-                .catch(err => console.error('Failed to copy key: ', err));
-        }
+                }).catch(err => {
+                    console.error('Failed to copy text: ', err);
+                });
+            } else {
+                const textArea = document.createElement('textarea');
+                textArea.value = keysText;
+                textArea.style.position = 'fixed';  // Avoid scrolling to bottom of page
+                textArea.style.top = '0';
+                textArea.style.left = '0';
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+
+                try {
+                    const successful = document.execCommand('copy');
+                    const msg = successful ? 'successful' : 'unsuccessful';
+                    console.log('Fallback: Copying text command was ' + msg);
+                    if (successful) {
+                        copyStatus.classList.remove('hidden');
+                        setTimeout(() => copyStatus.classList.add('hidden'), 2000);
+                    }
+                } catch (err) {
+                    console.error('Fallback: Oops, unable to copy', err);
+                }
+
+                document.body.removeChild(textArea);
+            }
+        });
+
+        progressBar.style.width = '100%';
+        progressText.innerText = '100%';
+        progressLog.innerText = 'Complete';
+
+        startBtn.classList.remove('hidden');
+        keyCountSelect.classList.remove('hidden');
+        gameSelect.classList.remove('hidden');
+        startBtn.disabled = false;
     });
+
+    document.getElementById('generateMoreBtn').addEventListener('click', () => {
+        progressContainer.classList.add('hidden');
+        keyContainer.classList.add('hidden');
+        startBtn.classList.remove('hidden');
+        keyCountSelect.classList.remove('hidden');
+        gameSelect.classList.remove('hidden');
+        generatedKeysTitle.classList.add('hidden');
+        copyAllBtn.classList.add('hidden');
+        keysList.innerHTML = '';
+        keyCountLabel.innerText = 'Number of keys:';
+        
+        // Show the form sections again
+        gameSelectGroup.style.display = 'block';
+        keyCountGroup.style.display = 'block';
+    });
+
+    const generateClientId = () => {
+        const timestamp = Date.now();
+        const randomNumbers = Array.from({ length: 19 }, () => Math.floor(Math.random() * 10)).join('');
+        return `${timestamp}-${randomNumbers}`;
+    };
+
+    const login = async (clientId, appToken) => {
+        const response = await fetch('https://api.gamepromo.io/promo/login-client', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                appToken,
+                clientId,
+                clientOrigin: 'deviceid'
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to login');
+        }
+
+        const data = await response.json();
+        return data.clientToken;
+    };
+
+    const emulateProgress = async (clientToken, promoId) => {
+        const response = await fetch('https://api.gamepromo.io/promo/register-event', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${clientToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                promoId,
+                eventId: generateUUID(),
+                eventOrigin: 'undefined'
+            })
+        });
+
+        if (!response.ok) {
+            return false;
+        }
+
+        const data = await response.json();
+        return data.hasCode;
+    };
+
+    const generateKey = async (clientToken, promoId) => {
+        const response = await fetch('https://api.gamepromo.io/promo/create-code', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${clientToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                promoId
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to generate key');
+        }
+
+        const data = await response.json();
+        return data.promoCode;
+    };
+
+    const generateUUID = () => {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    };
+
+    const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+    const delayRandom = () => Math.random() / 3 + 1;
 });
