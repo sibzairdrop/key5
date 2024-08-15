@@ -133,3 +133,23 @@ button:hover {
     margin-top: 15px;
     color: green;
 }
+
+.button-group {
+    margin-top: 20px;
+}
+
+.button-group button {
+    background-color: #28a745;
+    border: none;
+    padding: 12px 20px;
+    color: white;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin: 10px;
+}
+
+.button-group button:hover {
+    background-color: #218838;
+}
